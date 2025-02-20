@@ -1,0 +1,6 @@
+<Project>
+	<UsingTask TaskName="Pompo.CodeGenerationBuildTask" AssemblyFile="..\lib\net9.0\Pompo.MSBuild.dll" />
+	<Target Name="PompoCodeGeneration" BeforeTargets="PrepareForBuild">
+		<Pompo.CodeGenerationBuildTask />
+	</Target>
+</Project>
