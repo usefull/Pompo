@@ -9,6 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Pompo.props">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Pompo.targets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
