@@ -20,6 +20,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Pompo.Codegenerator\Pompo.Codegenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Pompo\Pompo.csproj" />
 	</ItemGroup>
 
 </Project>

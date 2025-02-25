@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Pompo.Entities;
+using Pompo.Extensions;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -30,7 +32,7 @@ namespace Pompo
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            // Extract build property values and save them in the _props.
+            // Extract build property values and save them in the _props field.
             var propPipeline = context.AnalyzerConfigOptionsProvider
                 .SelectMany(SelectBuildProps)
                 .Collect();
@@ -39,8 +41,8 @@ namespace Pompo
             // Collect classes that should be accessible from JS and generate the necessary code.
             var pipeline =
                 context.SyntaxProvider.CreateSyntaxProvider(
-                    ClassDeclarationNodePredicate,
-                    (syntax, _) => syntax.Node)
+                    ClassDeclarationPredicate,
+                    ClassInfoExtractor)
                 .Collect();
             context.RegisterSourceOutput(pipeline, Build);
         }
@@ -65,47 +67,79 @@ namespace Pompo
         /// <param name="context">A source production context.</param>
         /// <param name="source">Actual build property values to save.</param>
         private void SetBuildProps(SourceProductionContext context, ImmutableArray<KeyValuePair<string, string>> source) =>        
-            _props = source.ToDictionary(s => s.Key, s => s.Value);        
+            _props = source.ToDictionary(s => s.Key, s => s.Value);
 
         /// <summary>
-        /// 
+        /// Selects class declarations whose instances should be accessible from JS.
         /// </summary>
         /// <param name="node"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private bool ClassDeclarationNodePredicate(SyntaxNode node, CancellationToken cancellationToken) =>
-            node is ClassDeclarationSyntax cds &&
-            cds.Members.Any(m =>
-                m is MethodDeclarationSyntax &&
-                m.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)) &&
-                m.AttributeLists.Any(al => al.Attributes.Any(a => ((a.Name as IdentifierNameSyntax)?.Identifier.Text ?? string.Empty) == "JSInvokable"))
+        private bool ClassDeclarationPredicate(SyntaxNode node, CancellationToken cancellationToken) =>
+            node is ClassDeclarationSyntax cds &&                               // select class declaration
+            cds.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)) &&     // with public modifier
+            !cds.Modifiers.Any(m => m.IsKind(SyntaxKind.StaticKeyword)) &&      // without static modifier
+            cds.Members.Any(JsInvokableMethodPredicat) &&                       // contains JS invokable methods
+            (                                                                   // with at least one public constructor
+                !cds.Members.Any(m => m is ConstructorDeclarationSyntax) ||
+                cds.Members.Where(m => m is ConstructorDeclarationSyntax)
+                        .Any(m => m.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)))
             );
 
-        private void Build(SourceProductionContext context, ImmutableArray<SyntaxNode> source)
+        private ClassDescription ClassInfoExtractor(GeneratorSyntaxContext context, CancellationToken cancellationToken)
         {
-            var ttt = source[0] as ClassDeclarationSyntax;
-            var methods = ttt.Members
-                .Where(m => m is MethodDeclarationSyntax)
-                .Where(m => m.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)))
-                .Where(m => m.AttributeLists.Any(al => al.Attributes.Any(a => ((a.Name as IdentifierNameSyntax)?.Identifier.Text ?? string.Empty) == "JSInvokable")))
-                ;
-            var aaa = methods.First().AttributeLists.SelectMany(al => al.Attributes);
+            ClassDescription classDescription = null;
 
-            var attr = (aaa.First().Name as IdentifierNameSyntax).Identifier.Text;
-            //SyntaxFactory.Token(SyntaxKind.PublicKeyword)
+            if (context.Node is ClassDeclarationSyntax cds)
+            {
+                classDescription = new ClassDescription
+                {
+                    Name = cds.Identifier.Text,
+                    Alias = cds.GetAlias(),
+                    Ctors = cds.Members.Where(m => m is ConstructorDeclarationSyntax)
+                        .Where(m => m.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)))
+                        .Select(m =>
+                        {
+                            var ctor = m as ConstructorDeclarationSyntax;
+                            return new CtorDescription
+                            {
+                                Alias = ctor?.GetAlias(),
+                                Parameters = ctor?.ParameterList?.Parameters
+                            };
+                        }).ToList(),
+                    Methods = cds.Members.Where(JsInvokableMethodPredicat)
+                        .Select(m =>
+                        {
+                            var method = m as MethodDeclarationSyntax;
+                            return new MethodDescription
+                            {
+                                Name = method?.Identifier.Text,
+                                Alias = method?.GetAlias(),
+                                Parameters = method?.ParameterList?.Parameters
+                            };
+                        }).ToList()
+                };
+            }
+
+            return classDescription;
+        }
+
+        /// <summary>
+        /// Selects JS invokable methods.
+        /// </summary>
+        /// <param name="mds">A class member declaration syntax.</param>
+        /// <returns>true if member is public non static JS invokable method, otherwise - false.</returns>
+        private bool JsInvokableMethodPredicat(MemberDeclarationSyntax mds) =>
+            mds is MethodDeclarationSyntax &&                                 // method declaration
+            !mds.Modifiers.Any(mf => mf.IsKind(SyntaxKind.StaticKeyword)) &&  // without static modifier
+            mds.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)) &&   // with public modifier
+            mds.AttributeLists.Any(al =>                                      // with JSInvokableAttribute
+                al.Attributes.Any(a => ((a.Name as IdentifierNameSyntax)?.Identifier.Text ?? string.Empty) == "JSInvokable")
+            );
+
+        private void Build(SourceProductionContext context, ImmutableArray<ClassDescription> source)
+        {
             ;
-//            context.AddSource("PompoTest", @"
-//namespace Pompo
-//{
-//    public static class Test
-//    {
-//        public static string Report() => $""{DateTime.Now}"";
-//    }
-//}
-//");
-//            context.AddSource("js", @"/*
-//alert('1235677';)
-//*/");
         }
     }
 }
