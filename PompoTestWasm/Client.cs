@@ -4,23 +4,29 @@ using Pompo;
 
 namespace PompoTestWasm
 {
-    [Alias("  erere  ")]
-    public class Client
+    [Alias("MainClient")]
+    public partial class SomeClient
     {
         private int _i;
 
-        [Alias("ddf")]
-        Client(int i)
+        //[Alias("Rem")]
+        public SomeClient()
         {
-            _i = i;
+            _i = 0;
         }
 
-        public Client()
+       
+        public SomeClient(int i, string i)
         {
             _i = 0;
         }
 
         [JSInvokable]
+        
         public void Return(int i, string str) { }
+
+        [JSInvokable]
+        
+        public void Term(int i, string str) { }
     }
 }

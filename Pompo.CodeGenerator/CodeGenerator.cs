@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Pompo.Entities;
 using Pompo.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -96,6 +97,8 @@ namespace Pompo
                 {
                     Name = cds.Identifier.Text,
                     Alias = cds.GetAlias(),
+                    SourceFilePath = cds.SyntaxTree.FilePath,
+                    Namespace = cds.GetNamespace(),
                     Ctors = cds.Members.Where(m => m is ConstructorDeclarationSyntax)
                         .Where(m => m.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)))
                         .Select(m =>
@@ -104,7 +107,8 @@ namespace Pompo
                             return new CtorDescription
                             {
                                 Alias = ctor?.GetAlias(),
-                                Parameters = ctor?.ParameterList?.Parameters
+                                Parameters = ctor?.ParameterList?.Parameters,
+                                SourceFilePath = ctor?.SyntaxTree.FilePath
                             };
                         }).ToList(),
                     Methods = cds.Members.Where(JsInvokableMethodPredicat)
@@ -115,7 +119,8 @@ namespace Pompo
                             {
                                 Name = method?.Identifier.Text,
                                 Alias = method?.GetAlias(),
-                                Parameters = method?.ParameterList?.Parameters
+                                Parameters = method?.ParameterList?.Parameters,
+                                SourceFilePath = method?.SyntaxTree.FilePath
                             };
                         }).ToList()
                 };
@@ -139,7 +144,41 @@ namespace Pompo
 
         private void Build(SourceProductionContext context, ImmutableArray<ClassDescription> source)
         {
+            var classGrouping = source.GroupBy(s => s.FullName);
+            var validationResults = classGrouping.SelectMany(g => g.Validate()).ToList();
+
+            if (validationResults.Count > 1)
+            {
+                ReportErrors(validationResults);
+                return;
+            }
+
+            classGrouping.Select(g =>
+            {
+                var result = g.First();
+                result.Alias = g.FirstOrDefault(i => !string.IsNullOrWhiteSpace(i.Alias))?.Alias;
+                result.Ctors = g.SelectMany(i => i.Ctors).ToList();
+                result.Methods = g.SelectMany(i => i.Methods).ToList();
+
+                return result;
+            })
+
             ;
+            //context.ReportDiagnostic(Diagnostic.Create(
+            //        new DiagnosticDescriptor(
+            //            "POMPO0000",
+            //            "An exception was thrown by the StrongInject generator",
+            //            "An exception was thrown by the StrongInject generator: '{0}'",
+            //            "StrongInject",
+            //            DiagnosticSeverity.Error,
+            //            isEnabledByDefault: true),
+            //        Location.None,
+            //        "detailed message"));
+        }
+
+        private void ReportErrors(List<Exception> validationResults)
+        {
+            throw new NotImplementedException();
         }
     }
 }
