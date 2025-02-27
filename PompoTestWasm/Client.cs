@@ -4,19 +4,12 @@ using Pompo;
 
 namespace PompoTestWasm
 {
-    [Alias("MainClient")]
-    public partial class SomeClient
+    public class SomeClient
     {
         private int _i;
 
         //[Alias("Rem")]
         public SomeClient()
-        {
-            _i = 0;
-        }
-
-       
-        public SomeClient(int i, string i)
         {
             _i = 0;
         }

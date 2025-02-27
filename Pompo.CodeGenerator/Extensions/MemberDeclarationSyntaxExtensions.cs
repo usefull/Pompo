@@ -35,7 +35,7 @@ namespace Pompo.Extensions
                     return null;
 
                 if (currentNode.Parent is BaseNamespaceDeclarationSyntax ns)
-                    return (ns.Name as IdentifierNameSyntax)?.Identifier.Text?.Trim();
+                    return ns.Name?.ToString();
 
                 currentNode = currentNode.Parent;
             }

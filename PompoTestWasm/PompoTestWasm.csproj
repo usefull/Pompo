@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	  <CompilerGeneratedFilesOutputPath>.g</CompilerGeneratedFilesOutputPath>
 	<PompoJsWrapperOutputDir>temp</PompoJsWrapperOutputDir>
 	<PompoJsWrapperOutputFile>p.js</PompoJsWrapperOutputFile>
   </PropertyGroup>
@@ -11,6 +13,7 @@
 	<ItemGroup>
 		<CompilerVisibleProperty Include="PompoJsWrapperOutputDir" />
 		<CompilerVisibleProperty Include="PompoJsWrapperOutputFile" />
+		<CompilerVisibleProperty Include="RootNamespace" />
 	</ItemGroup>
 
   <ItemGroup>

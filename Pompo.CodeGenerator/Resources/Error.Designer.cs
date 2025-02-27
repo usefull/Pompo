@@ -61,6 +61,15 @@ namespace Pompo.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на The alias &apos;{0}&apos; matches the class name..
+        /// </summary>
+        internal static string AliasMatchesClassName {
+            get {
+                return ResourceManager.GetString("AliasMatchesClassName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The alias ​​should not be a C# keyword..
         /// </summary>
         internal static string AliasMatchesKeyword {
@@ -70,7 +79,7 @@ namespace Pompo.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на The alias &apos;{0}&apos; mathes the method name in the class &apos;{1}&apos;.
+        ///   Ищет локализованную строку, похожую на The alias &apos;{0}&apos; matches the method name in the class &apos;{1}&apos;..
         /// </summary>
         internal static string AliasMatchesMethodName {
             get {
@@ -93,6 +102,15 @@ namespace Pompo.Resources {
         internal static string MultipleClassAliasDeclarations {
             get {
                 return ResourceManager.GetString("MultipleClassAliasDeclarations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Not unique class alias &apos;{0}&apos;..
+        /// </summary>
+        internal static string NotUniqueClassAlias {
+            get {
+                return ResourceManager.GetString("NotUniqueClassAlias", resourceCulture);
             }
         }
         

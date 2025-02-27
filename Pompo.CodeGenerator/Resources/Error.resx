@@ -117,17 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AliasMatchesClassName" xml:space="preserve">
+    <value>The alias '{0}' matches the class name.</value>
+  </data>
   <data name="AliasMatchesKeyword" xml:space="preserve">
     <value>The alias ​​should not be a C# keyword.</value>
   </data>
   <data name="AliasMatchesMethodName" xml:space="preserve">
-    <value>The alias '{0}' mathes the method name in the class '{1}'</value>
+    <value>The alias '{0}' matches the method name in the class '{1}'.</value>
   </data>
   <data name="AliasNotFollowRules" xml:space="preserve">
     <value>The alias must consist of letters, numbers or  _ and can not starts with numbers.</value>
   </data>
   <data name="MultipleClassAliasDeclarations" xml:space="preserve">
     <value>The alias ​​defined multiple times for the class '{0}'.</value>
+  </data>
+  <data name="NotUniqueClassAlias" xml:space="preserve">
+    <value>Not unique class alias '{0}'.</value>
   </data>
   <data name="OneAliasForSeveralCtors" xml:space="preserve">
     <value>The alias '{0}' defined for multiple constructors in the '{1}' class.</value>

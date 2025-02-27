@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Pompo.Entities;
+using Pompo.Exceptions;
 using Pompo.Extensions;
 using System;
 using System.Collections.Generic;
@@ -13,13 +14,14 @@ using System.Threading;
 namespace Pompo
 {
     [Generator]
-    public class CodeGenerator : IIncrementalGenerator
+    public partial class CodeGenerator : IIncrementalGenerator
     {
         /// <summary>
         /// The list of build properties required for source generation and their default values.
         /// </summary>
         private readonly Dictionary<string, string> _defaultProps = new Dictionary<string, string>
         {
+            { "build_property.RootNamespace", string.Empty },
             { "build_property.PompoJsWrapperOutputDir", "wwwroot" },
             { "build_property.PompoJsWrapperOutputFile", "_pompo.js" }
         };
@@ -142,26 +144,61 @@ namespace Pompo
                 al.Attributes.Any(a => ((a.Name as IdentifierNameSyntax)?.Identifier.Text ?? string.Empty) == "JSInvokable")
             );
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="source"></param>
         private void Build(SourceProductionContext context, ImmutableArray<ClassDescription> source)
         {
+            // Grouping partial classes descriptions.
             var classGrouping = source.GroupBy(s => s.FullName);
+
+            // Each group validating.
             var validationResults = classGrouping.SelectMany(g => g.Validate()).ToList();
 
-            if (validationResults.Count > 1)
-            {
-                ReportErrors(validationResults);
-                return;
-            }
-
-            classGrouping.Select(g =>
+            // Merging partial classes descriptions.
+            var classes = classGrouping.Select(g =>
             {
                 var result = g.First();
                 result.Alias = g.FirstOrDefault(i => !string.IsNullOrWhiteSpace(i.Alias))?.Alias;
                 result.Ctors = g.SelectMany(i => i.Ctors).ToList();
                 result.Methods = g.SelectMany(i => i.Methods).ToList();
+                result.UniqueName = string.IsNullOrWhiteSpace(result.Alias) ? result.Name : result.Alias;
 
                 return result;
-            })
+            }).ToList();
+
+            // Checking class aliases for uniqueness.
+            var classAliases = classes.Where(c => !string.IsNullOrWhiteSpace(c.Alias)).GroupBy(c => c.Alias);
+            var nonUnique = classAliases.FirstOrDefault(g => g.Count() > 1);
+            if (nonUnique != null)
+                validationResults.Add(new InvalidAliasException(string.Format(Resources.Error.NotUniqueClassAlias, nonUnique.Key)));
+
+            // Check if alice matches any nonaliased class name.
+            var classNameMatchingAlias = classAliases.Select(a => a.Key).Intersect(classes.Where(c => string.IsNullOrWhiteSpace(c.Alias)).Select(c => c.Name)).FirstOrDefault();
+            if (classNameMatchingAlias != null)
+                validationResults.Add(new InvalidAliasException(string.Format(Resources.Error.AliasMatchesClassName, classNameMatchingAlias)));
+
+            // Report validation errors if exists and abort generation.
+            if (validationResults.Count > 0)
+            {
+                ReportErrors(validationResults);
+                return;
+            }
+
+            // Tune unique names.
+            foreach (var grouping in classes.Where(c => string.IsNullOrWhiteSpace(c.Alias)).GroupBy(c => c.UniqueName).Where(g => g.Count() > 1))
+            {
+                var classesToUnique = grouping.Any(c => string.IsNullOrWhiteSpace(c.Namespace))
+                    ? grouping.Where(c => !string.IsNullOrWhiteSpace(c.Namespace))
+                    : grouping.Skip(1);
+
+                classesToUnique.ToList().ForEach(c => c.UniqueName = c.FullName.Replace('.', '_'));
+            }
+
+            context.AddSource("Factory", GenerateFactorySourceCode(classes));
+            //context.AddSource("Transmit", GenerateTransmitterSourceCode(classes));
 
             ;
             //context.ReportDiagnostic(Diagnostic.Create(

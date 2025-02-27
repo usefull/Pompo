@@ -25,6 +25,8 @@ namespace Pompo.Entities
         /// </summary>
         public string Alias { get; set; }
 
+        public string UniqueName { get; set; }
+
         /// <summary>
         /// Constructor list.
         /// </summary>
@@ -53,7 +55,7 @@ namespace Pompo.Entities
         {
             try
             {
-                Alias.ValidateAlias();
+                Alias?.ValidateAlias();
                 return Enumerable.Empty<Exception>();
             }
             catch (Exception e)
