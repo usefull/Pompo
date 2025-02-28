@@ -1,47 +1,47 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Pompo.Extensions;
-using System;
+﻿using Pompo.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Pompo.Entities
 {
-    /// <summary>
-    /// A description of a class constructor.
-    /// </summary>
-    internal class CtorDescription
+    internal abstract class BaseCodeEntityDescription
     {
         /// <summary>
-        /// Object alias.
+        /// Entity alias.
         /// </summary>
         public string Alias { get; set; }
 
         /// <summary>
-        /// Source file path in which the object defined.
+        /// Source file path in which the entity defined.
         /// </summary>
         public string SourceFilePath { get; set; }
 
         /// <summary>
-        /// The parameter list.
+        /// Entity name.
         /// </summary>
-        public SeparatedSyntaxList<ParameterSyntax>? Parameters { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Validates the object.
+        /// Transmit name.
+        /// </summary>
+        abstract public string TransmitName { get; }
+
+        /// <summary>
+        /// Validates the entity.
         /// </summary>
         /// <returns></returns>
         public IEnumerable<Exception> Validate()
         {
             try
             {
-                Alias.ValidateAlias();
+                Alias?.ValidateAlias();
                 return Enumerable.Empty<Exception>();
             }
             catch (Exception e)
             {
                 e.Data.Add("file", SourceFilePath);
-                return new [] { e };
+                return new[] { e };
             }
         }
     }

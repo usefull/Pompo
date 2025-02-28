@@ -106,11 +106,12 @@ namespace Pompo
                         .Select(m =>
                         {
                             var ctor = m as ConstructorDeclarationSyntax;
-                            return new CtorDescription
+                            return new MethodDescription
                             {
                                 Alias = ctor?.GetAlias(),
                                 Parameters = ctor?.ParameterList?.Parameters,
-                                SourceFilePath = ctor?.SyntaxTree.FilePath
+                                SourceFilePath = ctor?.SyntaxTree.FilePath,
+                                Name = cds.Identifier.Text
                             };
                         }).ToList(),
                     Methods = cds.Members.Where(JsInvokableMethodPredicat)
@@ -164,7 +165,18 @@ namespace Pompo
                 result.Alias = g.FirstOrDefault(i => !string.IsNullOrWhiteSpace(i.Alias))?.Alias;
                 result.Ctors = g.SelectMany(i => i.Ctors).ToList();
                 result.Methods = g.SelectMany(i => i.Methods).ToList();
-                result.UniqueName = string.IsNullOrWhiteSpace(result.Alias) ? result.Name : result.Alias;
+
+                if (result.Ctors.Count < 1)
+                    result.Ctors.Add(new MethodDescription
+                    {
+                        Alias = result.Alias,
+                        Name = result.Name,
+                        SourceFilePath = result.SourceFilePath
+                    });
+
+                var nonaliasedCtor = result.Ctors.FirstOrDefault(c => string.IsNullOrWhiteSpace(c.Alias));
+                if (nonaliasedCtor != null && !string.IsNullOrWhiteSpace(result.Alias))
+                    nonaliasedCtor.Name = result.Alias;
 
                 return result;
             }).ToList();
@@ -188,17 +200,17 @@ namespace Pompo
             }
 
             // Tune unique names.
-            foreach (var grouping in classes.Where(c => string.IsNullOrWhiteSpace(c.Alias)).GroupBy(c => c.UniqueName).Where(g => g.Count() > 1))
-            {
-                var classesToUnique = grouping.Any(c => string.IsNullOrWhiteSpace(c.Namespace))
-                    ? grouping.Where(c => !string.IsNullOrWhiteSpace(c.Namespace))
-                    : grouping.Skip(1);
+            //foreach (var grouping in classes.Where(c => string.IsNullOrWhiteSpace(c.Alias)).GroupBy(c => c.TransmitName).Where(g => g.Count() > 1))
+            //{
+            //    var classesToUnique = grouping.Any(c => string.IsNullOrWhiteSpace(c.Namespace))
+            //        ? grouping.Where(c => !string.IsNullOrWhiteSpace(c.Namespace))
+            //        : grouping.Skip(1);
 
-                classesToUnique.ToList().ForEach(c => c.UniqueName = c.FullName.Replace('.', '_'));
-            }
+            //    classesToUnique.ToList().ForEach(c => c.TransmitName = c.FullName.Replace('.', '_'));
+            //}
 
             context.AddSource("Factory", GenerateFactorySourceCode(classes));
-            //context.AddSource("Transmit", GenerateTransmitterSourceCode(classes));
+            context.AddSource("Transmit", GenerateTransmitterSourceCode(classes));
 
             ;
             //context.ReportDiagnostic(Diagnostic.Create(

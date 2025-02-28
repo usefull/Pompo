@@ -1,13 +1,21 @@
-﻿namespace Pompo.Entities
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace Pompo.Entities
 {
     /// <summary>
-    /// A description of a class method.
+    /// A description of a class constructor.
     /// </summary>
-    internal class MethodDescription : CtorDescription
+    internal class MethodDescription : BaseCodeEntityDescription
     {
         /// <summary>
-        /// The method name.
+        /// The parameter list.
         /// </summary>
-        public string Name { get; set; }
+        public SeparatedSyntaxList<ParameterSyntax>? Parameters { get; set; }
+
+        /// <summary>
+        /// Transmit name.
+        /// </summary>
+        public override string TransmitName => $"{( string.IsNullOrWhiteSpace(Alias) ? Name : Alias )}";
     }
 }

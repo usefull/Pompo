@@ -141,4 +141,7 @@
   <data name="OneAliasForSeveralMethods" xml:space="preserve">
     <value>The alias '{0}' defined for multiple methods in the '{1}' class.</value>
   </data>
+  <data name="SeveralNotAliasedCtors" xml:space="preserve">
+    <value>There are several nonaliased constructors in the '{0}' class.</value>
+  </data>
 </root>

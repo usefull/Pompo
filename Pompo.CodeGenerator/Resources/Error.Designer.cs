@@ -131,5 +131,14 @@ namespace Pompo.Resources {
                 return ResourceManager.GetString("OneAliasForSeveralMethods", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на There are several nonaliased constructors in the &apos;{0}&apos; class..
+        /// </summary>
+        internal static string SeveralNotAliasedCtors {
+            get {
+                return ResourceManager.GetString("SeveralNotAliasedCtors", resourceCulture);
+            }
+        }
     }
 }

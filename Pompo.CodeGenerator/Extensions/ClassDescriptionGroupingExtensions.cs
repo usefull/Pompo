@@ -28,7 +28,11 @@ namespace Pompo.Extensions
             // Each constructor overload must have a unique alias.
             var multipleCtorAlias = grouping.SelectMany(c => c.Ctors).GroupBy(c => c.Alias).FirstOrDefault(g => g.Count() > 1);
             if (multipleCtorAlias != null)
-                validationResults.Add(new InvalidAliasException(string.Format(Resources.Error.OneAliasForSeveralCtors, multipleCtorAlias.Key, grouping.Key)));
+                validationResults.Add(new InvalidAliasException(
+                    string.IsNullOrWhiteSpace(multipleCtorAlias.Key)
+                    ? string.Format(Resources.Error.SeveralNotAliasedCtors, grouping.Key)
+                    : string.Format(Resources.Error.OneAliasForSeveralCtors, multipleCtorAlias.Key, grouping.Key)
+                ));
 
             var methods = grouping.SelectMany(c => c.Methods);
             var nonAliased = methods.Where(m => string.IsNullOrWhiteSpace(m.Alias)).Select(m => m.Name);

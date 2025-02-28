@@ -1,36 +1,21 @@
-﻿using Pompo.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Pompo.Entities
 {
     /// <summary>
     /// A description of a class.
     /// </summary>
-    internal class ClassDescription
+    internal class ClassDescription : BaseCodeEntityDescription
     {
-        /// <summary>
-        /// Class name.
-        /// </summary>
-        public string Name { get; set; }
-
         /// <summary>
         /// Class namespace.
         /// </summary>
         public string Namespace { get; set; }
 
         /// <summary>
-        /// Class alias.
-        /// </summary>
-        public string Alias { get; set; }
-
-        public string UniqueName { get; set; }
-
-        /// <summary>
         /// Constructor list.
         /// </summary>
-        public IList<CtorDescription> Ctors { get; set; }
+        public IList<MethodDescription> Ctors { get; set; }
 
         /// <summary>
         /// Method list.
@@ -38,31 +23,15 @@ namespace Pompo.Entities
         public IList<MethodDescription> Methods { get; set; }
 
         /// <summary>
-        /// Source file path.
-        /// </summary>
-        public string SourceFilePath { get; set; }
-
-        /// <summary>
         /// Class full name.
         /// </summary>
         public string FullName => $"{Namespace}{(string.IsNullOrWhiteSpace(Namespace) ? string.Empty : ".")}{Name}";
 
         /// <summary>
-        /// Vdlidates the object.
+        /// Transmit name.
         /// </summary>
-        /// <returns>The validation exception list.</returns>
-        public IEnumerable<Exception> Validate()
-        {
-            try
-            {
-                Alias?.ValidateAlias();
-                return Enumerable.Empty<Exception>();
-            }
-            catch (Exception e)
-            {
-                e.Data.Add("file", SourceFilePath);
-                return new [] { e };
-            }
-        }
+        public override string TransmitName => string.IsNullOrWhiteSpace(Alias)
+            ? $"{(string.IsNullOrWhiteSpace(Namespace) ? string.Empty : $"{Namespace?.Replace('.', '_')}_")}{Name}"
+            : Alias;
     }
 }
