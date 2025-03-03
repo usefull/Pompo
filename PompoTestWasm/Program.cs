@@ -10,4 +10,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 //Console.WriteLine(Pompo.Test.Report());
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+await host.UsePompo();
+
+await host.RunAsync();

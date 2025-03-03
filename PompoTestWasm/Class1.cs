@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using Pompo;
 
 namespace PompoTestWasm
 {

@@ -3,4 +3,15 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>.g</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>
+	<PropertyGroup Condition="!Exists('$(PompoJsWrapperOutputDir)')">
+		<PompoJsWrapperOutputDir>wwwroot</PompoJsWrapperOutputDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="!Exists('$(PompoJsWrapperOutputFile)')">
+		<PompoJsWrapperOutputFile>_pompo.js</PompoJsWrapperOutputFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<CompilerVisibleProperty Include="PompoJsWrapperOutputDir" />
+		<CompilerVisibleProperty Include="PompoJsWrapperOutputFile" />
+		<CompilerVisibleProperty Include="RootNamespace" />
+	</ItemGroup>
 </Project>

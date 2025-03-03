@@ -175,8 +175,8 @@ namespace Pompo
                     });
 
                 var nonaliasedCtor = result.Ctors.FirstOrDefault(c => string.IsNullOrWhiteSpace(c.Alias));
-                if (nonaliasedCtor != null && !string.IsNullOrWhiteSpace(result.Alias))
-                    nonaliasedCtor.Name = result.Alias;
+                if (nonaliasedCtor != null)
+                    nonaliasedCtor.Name = result.TransmitName;
 
                 return result;
             }).ToList();
@@ -195,39 +195,27 @@ namespace Pompo
             // Report validation errors if exists and abort generation.
             if (validationResults.Count > 0)
             {
-                ReportErrors(validationResults);
+                ReportErrors(context, validationResults);
                 return;
             }
 
-            // Tune unique names.
-            //foreach (var grouping in classes.Where(c => string.IsNullOrWhiteSpace(c.Alias)).GroupBy(c => c.TransmitName).Where(g => g.Count() > 1))
-            //{
-            //    var classesToUnique = grouping.Any(c => string.IsNullOrWhiteSpace(c.Namespace))
-            //        ? grouping.Where(c => !string.IsNullOrWhiteSpace(c.Namespace))
-            //        : grouping.Skip(1);
-
-            //    classesToUnique.ToList().ForEach(c => c.TransmitName = c.FullName.Replace('.', '_'));
-            //}
-
-            context.AddSource("Factory", GenerateFactorySourceCode(classes));
-            context.AddSource("Transmit", GenerateTransmitterSourceCode(classes));
-
-            ;
-            //context.ReportDiagnostic(Diagnostic.Create(
-            //        new DiagnosticDescriptor(
-            //            "POMPO0000",
-            //            "An exception was thrown by the StrongInject generator",
-            //            "An exception was thrown by the StrongInject generator: '{0}'",
-            //            "StrongInject",
-            //            DiagnosticSeverity.Error,
-            //            isEnabledByDefault: true),
-            //        Location.None,
-            //        "detailed message"));
+            if (classes.Count > 0)
+            {
+                context.AddSource("Factory", classes.Count > 0 ? GenerateFactorySourceCode(classes) : " ");
+                context.AddSource("Transmit", classes.Count > 0 ? GenerateTransmitterSourceCode(classes) : " ");
+                context.AddSource("WebAssemblyHostExtension", classes.Count > 0 ? GenerateWebAssemblyHostExtensionCode() : " ");
+            }
         }
 
-        private void ReportErrors(List<Exception> validationResults)
-        {
-            throw new NotImplementedException();
-        }
+        private void ReportErrors(SourceProductionContext context, List<Exception> validationResults) =>
+            validationResults.ForEach(vr => context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "POMPO0001",
+                    "Pompo source generator error",
+                    vr.Message,
+                    "PompoGeneration",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true),
+                Location.None)));
     }
 }

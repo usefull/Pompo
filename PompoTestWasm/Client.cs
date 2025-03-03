@@ -1,25 +1,24 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 using Pompo;
 
 namespace PompoTestWasm
 {
-    [Alias("qwerty")]
+    //[Alias("qwerty")]
     public partial class SomeClient
     {
         private int _i;
 
-        [Alias("Erm")]
-        public SomeClient()
-        {
-            _i = 0;
-        }
+        //[Alias("Erm")]
+        //public SomeClient()
+        //{
+        //    _i = 0;
+        //}
 
-        [Alias("Rem")]
-        public SomeClient(int i)
-        {
-            _i = i;
-        }
+        //[Alias("Rem")]
+        //public SomeClient(int i)
+        //{
+        //    _i = i;
+        //}
 
         [JSInvokable]
         [Alias("Term1")]      
