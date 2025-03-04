@@ -1,7 +1,7 @@
 <Project>	
-	<UsingTask TaskName="Pompo.CodeGenerationBuildTask" AssemblyFile="..\lib\net9.0\Pompo.MSBuild.dll" />
+	<UsingTask TaskName="Pompo.PostGenerationBuildTask" AssemblyFile="..\lib\net9.0\Pompo.MSBuild.dll" />
 	<Target Name="PompoCodeGeneration" AfterTargets="Build">
-		<Pompo.CodeGenerationBuildTask
+		<Pompo.PostGenerationBuildTask
 			Src="$(MSBuildProjectDirectory)\$(CompilerGeneratedFilesOutputPath)\Pompo.CodeGenerator\Pompo.CodeGenerator\Transmit.cs"
 			Dest="$(MSBuildProjectDirectory)\$(PompoJsWrapperOutputDir)\$(PompoJsWrapperOutputFile)" />
 	</Target>

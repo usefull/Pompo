@@ -1,30 +1,39 @@
 ﻿using Microsoft.JSInterop;
 using Pompo;
+using System.Text.Json;
 
 namespace PompoTestWasm
 {
-    //[Alias("qwerty")]
+    [Alias("FakeClient")]
     public partial class SomeClient
     {
-        private int _i;
+        [JSInvokable]
+        [Alias("Run")]      
+        public async Task DoSomeWork(int iter)
+        {
+            if (iter < 1)
+                return;
 
-        //[Alias("Erm")]
-        //public SomeClient()
-        //{
-        //    _i = 0;
-        //}
+            var rnd = new Random();
 
-        //[Alias("Rem")]
-        //public SomeClient(int i)
-        //{
-        //    _i = i;
-        //}
+            for (var i = 0; i < iter; i++)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(rnd.Next(1, 10)));
+                Console.WriteLine($"Iteration {i + 1} done.");
+            }
+        }
 
         [JSInvokable]
-        [Alias("Term1")]      
-        public void Return(int i, string str) { }
+        public string? PassObject(JsonElement obj) => obj.GetRawText();
 
-        [JSInvokable]        
-        public void Term(int i, string str) { }
+        [JSInvokable]
+        public Selector GetObject() => new Selector { Name = "TETYETT IOIYIY erer 2434 fgf", Value = 1.256 };
+    }
+
+    public class Selector
+    {
+        public string Name { get; set; }
+
+        public double Value { get; set; }
     }
 }

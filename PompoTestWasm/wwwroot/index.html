@@ -7,8 +7,6 @@
     <title>PompoTestWasm</title>
     <base href="/" />
     <link rel="stylesheet" href="css/app.css" />
-    <!-- If you add any scoped CSS files, uncomment the following to load them
-    <link href="PompoTestWasm.styles.css" rel="stylesheet" /> -->
 </head>
 
 <body>
@@ -26,6 +24,10 @@
         <span class="dismiss">🗙</span>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            setTimeout(() => window.dotNetObjectFactory.create_FakeClient().then(o => window.myClient = o), 5000);
+        };
+    </script>
 </body>
-
 </html>

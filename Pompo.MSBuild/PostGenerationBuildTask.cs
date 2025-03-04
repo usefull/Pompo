@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Pompo
 {
-    public class CodeGenerationBuildTask : Task
+    public class PostGenerationBuildTask : Task
     {
         [Required]
         public string Src { get; set; }
@@ -14,14 +14,14 @@ namespace Pompo
 
         public override bool Execute()
         {
-            Log.LogMessage(MessageImportance.High, "Pompo is here !!!");
-            Log.LogMessage(MessageImportance.High, Src);
-            Log.LogMessage(MessageImportance.High, Dest);
-
             File.WriteAllText(
                 Dest,
                 File.ReadAllText(Src).Replace("/*", string.Empty).Replace("*/", string.Empty)
             );
+
+            Log.LogMessage(MessageImportance.High, $"Pompo JS transmitter has uncommented and copied:");
+            Log.LogMessage(MessageImportance.High, $"\tfrom {Src}");
+            Log.LogMessage(MessageImportance.High, $"\tto {Dest}");
 
             return true;
         }

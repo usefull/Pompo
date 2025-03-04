@@ -96,7 +96,7 @@ export function transmit(obj) {{
         /// <returns></returns>
         private string GenerateMethodInvokes(ClassDescription c) => string.Join(
             "\n", c.Methods.Select(m => $@"
-        o.{m.TransmitName} = async ({m.Parameters?.ToJsLikeParameterListString()}) => await foo.invokeMethodAsync(
+        o.{m.TransmitName} = async ({m.Parameters?.ToJsLikeParameterListString()}) => await o.invokeMethodAsync(
             '{m.Name}'{(string.IsNullOrWhiteSpace(m.Parameters?.ToJsLikeParameterListString()) ? string.Empty : $@",
             {m.Parameters?.ToJsLikeParameterListString()}")}
         );"));
@@ -117,7 +117,7 @@ using Microsoft.JSInterop;
 {(string.IsNullOrWhiteSpace(_props["build_property.RootNamespace"]) ? string.Empty : "{")}
     public static class WebAssemblyHostExtension
     {{
-        public static async Task UsePompo(this WebAssemblyHost host)
+        public static async Task UsePompoAsync(this WebAssemblyHost host)
         {{
             var jsRuntime = host.Services.GetRequiredService<IJSRuntime>();
             var jsTransmitModule = await jsRuntime.InvokeAsync<IJSObjectReference>(""import"", ""./{_props["build_property.PompoJsWrapperOutputFile"]}"");
