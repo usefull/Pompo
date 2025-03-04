@@ -3,10 +3,6 @@
     "Профиль 1": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "..\\PompoTestWasm\\PompoTestWasm.csproj"
-    },
-    "Профиль 2": {
-      "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\ConsoleApp1\\ConsoleApp1.csproj"
     }
   }
 }

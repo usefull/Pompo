@@ -6,4 +6,9 @@
 
 Welcome to your new app.
 
-<button onclick="window.myClient.get().then(r => console.log(r))">Start</button>
+@* <button onclick="window.dotNetObjectFactory.create_UsefulWorker().then(o => window.UsefulWorker = o)">UsefulWorker</button>
+ *@
+<button onclick="window.UsefulWorker.GetId().then(r => console.log(r))">UsefulWorker</button>
+<button onclick="window.Worker.GetId().then(r => console.log(r))">Worker</button>
+<button onclick="window.FakeClient.get().then(r => console.log(r))">FakeClient</button>
+<button onclick="window.NamedClient.get().then(r => console.log(r))">NamedClient</button>

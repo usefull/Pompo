@@ -2,6 +2,22 @@
 using Pompo;
 using System.Text.Json;
 
+namespace WasmModule
+{
+    [PompoAlias("Worker")]
+    public class UsefulWorker(string id)
+    {
+        private string _id = id;
+
+        public UsefulWorker() : this(string.Empty)
+        {
+        }
+
+        [JSInvokable]
+        public string GetId() => _id;
+    }
+}
+
 namespace PompoTestWasm
 {
     [PompoAlias("FakeClient")]
@@ -11,7 +27,7 @@ namespace PompoTestWasm
 
         public SomeClient()
         {
-            
+
         }
 
         [PompoAlias("NamedClient")]
@@ -20,7 +36,7 @@ namespace PompoTestWasm
             _name = name;
         }
 
-        [JSInvokable("Run")]  
+        [JSInvokable("Run")]
         public async Task DoSomeWork(int iter)
         {
             if (iter < 1)

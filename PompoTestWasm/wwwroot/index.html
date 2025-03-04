@@ -24,10 +24,17 @@
         <span class="dismiss">🗙</span>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    
     <script type="text/javascript">
         window.onload = function () {
-            setTimeout(() => window.dotNetObjectFactory.create_NamedClient('САШКА!!!').then(o => window.myClient = o), 5000);
+            setTimeout(() => {
+                window.dotNetObjectFactory.create_UsefulWorker().then(o => window.UsefulWorker = o);
+                window.dotNetObjectFactory.create_Worker('identity123').then(o => window.Worker = o);
+                window.dotNetObjectFactory.create_FakeClient().then(o => window.FakeClient = o);
+                window.dotNetObjectFactory.create_NamedClient('САШКА!!!').then(o => window.NamedClient = o);
+            }, 5000);
         };
     </script>
+    
 </body>
 </html>

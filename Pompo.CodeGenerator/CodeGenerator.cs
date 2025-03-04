@@ -108,6 +108,16 @@ namespace Pompo
 
             if (context.Node is ClassDeclarationSyntax cds)
             {
+                var ctors = cds.ParameterList != null
+                    ? new List<MethodDescription> {new MethodDescription
+                    {
+                        Alias = cds.GetAlias(),
+                        Parameters = cds.ParameterList.Parameters,
+                        SourceFilePath = cds.SyntaxTree.FilePath,
+                        Name = cds.Identifier.Text
+                    }}
+                    : new List<MethodDescription>();
+
                 classDescription = new ClassDescription
                 {
                     Name = cds.Identifier.Text,
@@ -126,7 +136,7 @@ namespace Pompo
                                 SourceFilePath = ctor?.SyntaxTree.FilePath,
                                 Name = cds.Identifier.Text
                             };
-                        }).ToList(),
+                        }).Concat(ctors).ToList(),
                     Methods = cds.Members.Where(JsInvokableMethodPredicat)
                         .Select(m =>
                         {
@@ -189,8 +199,8 @@ namespace Pompo
                     });
 
                 var nonaliasedCtor = result.Ctors.FirstOrDefault(c => string.IsNullOrWhiteSpace(c.Alias));
-                if (nonaliasedCtor != null)
-                    nonaliasedCtor.Name = result.TransmitName;
+                if (nonaliasedCtor != null && !string.IsNullOrWhiteSpace(result.Alias) && !result.Ctors.Any(c => c.Alias == result.Alias))
+                    nonaliasedCtor.Alias = result.Alias;
 
                 return result;
             }).ToList();

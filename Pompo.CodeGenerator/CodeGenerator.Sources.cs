@@ -46,7 +46,7 @@ using Microsoft.JSInterop;
             "\n",
             classes.SelectMany(c => c.Ctors.Select(ctor => $@"
         [JSInvokable]
-        public async Task Create_{(string.IsNullOrWhiteSpace(ctor.Alias) ? c.TransmitName : ctor.Alias)}({ctor.Parameters}) => await TransmitObject(DotNetObjectReference.Create(new {c.FullName}({ctor.Parameters?.ToJsLikeParameterListString()})));")));
+        public async Task Create_{ctor.TransmitName}({ctor.Parameters}) => await TransmitObject(DotNetObjectReference.Create(new {c.FullName}({ctor.Parameters?.ToJsLikeParameterListString()})));")));
 
         /// <summary>
         /// Generates JS transmitter source code.
