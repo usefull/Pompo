@@ -5,6 +5,9 @@ using System;
 
 namespace Pompo.Entities
 {
+    /// <summary>
+    /// Base code entity description.
+    /// </summary>
     internal abstract class BaseCodeEntityDescription
     {
         /// <summary>
@@ -30,7 +33,7 @@ namespace Pompo.Entities
         /// <summary>
         /// Validates the entity.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Collection of validation errors.</returns>
         public IEnumerable<Exception> Validate()
         {
             try

@@ -12,11 +12,4 @@
     <PackageReference Include="Pompo" Version="1.0.0" />
   </ItemGroup>
 
-	<!--
-	<ItemGroup>
-		<ProjectReference Include="..\Pompo.CodeGenerator\Pompo.CodeGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
-		<ProjectReference Include="..\Pompo\Pompo.csproj" />
-	</ItemGroup>
-	-->
-
 </Project>

@@ -4,14 +4,27 @@ using System.IO;
 
 namespace Pompo
 {
+    /// <summary>
+    /// MSBuild task for JS transmitter uncommenting and copying it to a target destination.
+    /// </summary>
     public class PostGenerationBuildTask : Task
     {
+        /// <summary>
+        /// Generated source file path.
+        /// </summary>
         [Required]
         public string Src { get; set; }
 
+        /// <summary>
+        /// Target file path.
+        /// </summary>
         [Required]
         public string Dest { get; set; }
 
+        /// <summary>
+        /// Executes task.
+        /// </summary>
+        /// <returns></returns>
         public override bool Execute()
         {
             File.WriteAllText(

@@ -3,7 +3,7 @@
 namespace Pompo.Exceptions
 {
     /// <summary>
-    /// Thrown in case of ambiguous use of alias.
+    /// Throws in case of ambiguous use of alias.
     /// </summary>
     internal class InvalidAliasException : Exception
     {
@@ -11,8 +11,6 @@ namespace Pompo.Exceptions
         /// Constructor.
         /// </summary>
         /// <param name="message">An error message.</param>
-        public InvalidAliasException(string message) : base(message)
-        {
-        }
+        public InvalidAliasException(string message) : base(message) { }
     }
 }

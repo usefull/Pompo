@@ -26,7 +26,7 @@
     <script src="_framework/blazor.webassembly.js"></script>
     <script type="text/javascript">
         window.onload = function () {
-            setTimeout(() => window.dotNetObjectFactory.create_FakeClient().then(o => window.myClient = o), 5000);
+            setTimeout(() => window.dotNetObjectFactory.create_NamedClient('САШКА!!!').then(o => window.myClient = o), 5000);
         };
     </script>
 </body>

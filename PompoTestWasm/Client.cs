@@ -4,11 +4,23 @@ using System.Text.Json;
 
 namespace PompoTestWasm
 {
-    [Alias("FakeClient")]
+    [PompoAlias("FakeClient")]
     public partial class SomeClient
     {
-        [JSInvokable]
-        [Alias("Run")]      
+        private string? _name;
+
+        public SomeClient()
+        {
+            
+        }
+
+        [PompoAlias("NamedClient")]
+        public SomeClient(string name)
+        {
+            _name = name;
+        }
+
+        [JSInvokable("Run")]  
         public async Task DoSomeWork(int iter)
         {
             if (iter < 1)
@@ -26,8 +38,8 @@ namespace PompoTestWasm
         [JSInvokable]
         public string? PassObject(JsonElement obj) => obj.GetRawText();
 
-        [JSInvokable]
-        public Selector GetObject() => new Selector { Name = "TETYETT IOIYIY erer 2434 fgf", Value = 1.256 };
+        [JSInvokable("get")]
+        public Selector GetObject() => new Selector { Name = $"{_name} TETYETT IOIYIY erer 2434 fgf", Value = 1.256 };
     }
 
     public class Selector

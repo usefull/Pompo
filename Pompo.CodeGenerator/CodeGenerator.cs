@@ -13,6 +13,9 @@ using System.Threading;
 
 namespace Pompo
 {
+    /// <summary>
+    /// Generates source code for a object creation factory class, a WebAssemblyHost extension and a JS transmitter.
+    /// </summary>
     [Generator]
     public partial class CodeGenerator : IIncrementalGenerator
     {
@@ -33,6 +36,10 @@ namespace Pompo
         /// <see cref="SetBuildProps(SourceProductionContext, ImmutableArray{KeyValuePair{string, string}})"/></remarks>
         private Dictionary<string, string> _props;
 
+        /// <summary>
+        /// Initializes source code analizer pipelines.
+        /// </summary>
+        /// <param name="context">Initialization context.</param>
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Extract build property values and save them in the _props field.
@@ -73,11 +80,11 @@ namespace Pompo
             _props = source.ToDictionary(s => s.Key, s => s.Value);
 
         /// <summary>
-        /// Selects class declarations whose instances should be accessible from JS.
+        /// Selection predicat for class declarations whose instances should be accessible from JS.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="node">Syntax node.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>true if node is class declaration whose instance should be accessible from JS, otherwise - false.</returns>
         private bool ClassDeclarationPredicate(SyntaxNode node, CancellationToken cancellationToken) =>
             node is ClassDeclarationSyntax cds &&                               // select class declaration
             cds.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)) &&     // with public modifier
@@ -89,6 +96,12 @@ namespace Pompo
                         .Any(m => m.Modifiers.Any(mf => mf.IsKind(SyntaxKind.PublicKeyword)))
             );
 
+        /// <summary>
+        /// Extracts the class info from the syntax context.
+        /// </summary>
+        /// <param name="context">Syntax context.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>The class info or null if syntax context is not a class declaration.</returns>
         private ClassDescription ClassInfoExtractor(GeneratorSyntaxContext context, CancellationToken cancellationToken)
         {
             ClassDescription classDescription = null;
@@ -118,10 +131,11 @@ namespace Pompo
                         .Select(m =>
                         {
                             var method = m as MethodDeclarationSyntax;
+                            var alias = method?.GetAlias();
                             return new MethodDescription
                             {
-                                Name = method?.Identifier.Text,
-                                Alias = method?.GetAlias(),
+                                Name = string.IsNullOrWhiteSpace(alias) ? method?.Identifier.Text : alias,
+                                Alias = alias,
                                 Parameters = method?.ParameterList?.Parameters,
                                 SourceFilePath = method?.SyntaxTree.FilePath
                             };
@@ -146,10 +160,10 @@ namespace Pompo
             );
 
         /// <summary>
-        /// 
+        /// Produces source code.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="source"></param>
+        /// <param name="context">Source production context.</param>
+        /// <param name="source">The collection of class declaration info.</param>
         private void Build(SourceProductionContext context, ImmutableArray<ClassDescription> source)
         {
             // Grouping partial classes descriptions.
@@ -207,6 +221,11 @@ namespace Pompo
             }
         }
 
+        /// <summary>
+        /// Reports validation errors.
+        /// </summary>
+        /// <param name="context">Source production context.</param>
+        /// <param name="validationResults">Validation errors.</param>
         private void ReportErrors(SourceProductionContext context, List<Exception> validationResults) =>
             validationResults.ForEach(vr => context.ReportDiagnostic(Diagnostic.Create(
                 new DiagnosticDescriptor(

@@ -14,11 +14,19 @@ namespace Pompo.Extensions
         /// </summary>
         /// <param name="member">A member declaration syntax object.</param>
         /// <returns>The alias string or <see cref="null"/> if the attribute is not found in the declaration.</returns>
-        public static string GetAlias(this MemberDeclarationSyntax member) =>
-            (member.AttributeLists.SelectMany(al => al.Attributes)
-                .FirstOrDefault(a => ((a.Name as IdentifierNameSyntax)?.Identifier.Text ?? string.Empty) == "Alias")
+        /// <remarks>The alias string extracts form the PompoAlias attribute for classes and constructors
+        /// or from JSInvokable attribute for methods.</remarks>
+        public static string GetAlias(this MemberDeclarationSyntax member)
+        {
+            var attrName = member is ClassDeclarationSyntax || member is ConstructorDeclarationSyntax
+                ? "PompoAlias"
+                : "JSInvokable";
+
+            return (member.AttributeLists.SelectMany(al => al.Attributes)
+                .FirstOrDefault(a => ((a.Name as IdentifierNameSyntax)?.Identifier.Text ?? string.Empty) == attrName)
                 ?.ArgumentList?.Arguments.FirstOrDefault()
                 ?.Expression as LiteralExpressionSyntax)?.Token.Value?.ToString()?.Trim();
+        }
 
         /// <summary>
         /// Extracts a namespace for member declarationSyntax
