@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Pompo.Extensions;
 
 namespace Pompo
@@ -61,6 +60,7 @@ using Microsoft.JSInterop;
 window.transmitFunc = (obj) => {{
     window.dotNetObjectFactory = obj;
     { GenerateCreateMethodsForTransmitter(classes) }
+    console.log('Pompo factory initialized.');
 }};
 
 export function transmit(obj) {{

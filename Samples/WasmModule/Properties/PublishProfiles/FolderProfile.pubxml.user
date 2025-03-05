@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>E:\Work\VisualStudio\Pompo\Samples\WasmModule\bin\Release\net9.0\browser-wasm\publish\</_PublishTargetUrl>
+    <History>True|2025-03-05T12:42:23.9178950Z||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>
