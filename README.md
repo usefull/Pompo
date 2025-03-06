@@ -79,6 +79,7 @@ namespace WasmModule
 ```
 As you can see, the service class is marked with an attribute _PompoAlias_ with a parameter _"demo"_. This means that the service will be available in the JS under the _demo_ name. The _PompoAlias_ attribute is otional. If the alias is not specified, the service name in JS will look like _{NAMESPACE}__{CLASSNAME}_.
 Class methods that are available for calling from JS are marked with the _JSInvokable_ attribute. The attribute parameter specifies the name of the method by which it will be available in JS. If the parameter is not specified, the method will be available by its real name. A class that has no JSInvokable methods will not be accessible in JS.
+
 6. Edit Program.cs.
 ```cs
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -92,6 +93,7 @@ await host.UsePompoAsync();
 await host.RunAsync();
 ```
 Here we just create the WebAssembly host, initialize the Pompo JS factory and launch the host.
+
 7. Build the application.
 8. Create the folder publish profile with default parameters and publish the application.
 
@@ -122,8 +124,8 @@ Pompo factory initialized.
 let demo = await window.dotNetObjectFactory.create_demo('foo');
 ```
 As you can see, to create the instance of the service, we use the _create_demo_ method. The method takes one argument, just like the service constructor.
-Method names for creating objects are formed as follows: _create__{SERVICENAME}_. _SERVICENAME_ is either an alias defined in the _PompoAlias_ attribute or a real class name with namespace.
-For example, if we didn't use the _PompoAlias_ attribute for the _DemoService_ class, the name of the method to create an instance of the service would look like this: _create__WasmModule__DemoService_.
+Method names for creating objects are formed as follows: create_{SERVICENAME}. _SERVICENAME_ is either an alias defined in the _PompoAlias_ attribute or a real class name with namespace.
+For example, if we didn't use the _PompoAlias_ attribute for the _DemoService_ class, the name of the method to create an instance of the service would look like this: create_WasmModule_DemoService.
 In any case, you can always look into the __pompo.js_ file and find out the name of a particular method.
 
 ## In conclusion
