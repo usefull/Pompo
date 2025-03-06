@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PompoTestWasm", "PompoTestW
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{30615ECD-82C4-4856-9082-2F493B78D54E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WasmModule", "Samples\WasmModule\WasmModule.csproj", "{A716F7D5-29E3-4FF8-96CF-24E05E9416BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WasmModule", "Samples\WasmModule\WasmModule.csproj", "{65FEF516-1CCE-4649-975D-FC31D9B8D5CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,15 +37,15 @@ Global
 		{622E7058-E716-482F-A055-5392B42D9AD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{622E7058-E716-482F-A055-5392B42D9AD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{622E7058-E716-482F-A055-5392B42D9AD6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A716F7D5-29E3-4FF8-96CF-24E05E9416BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A716F7D5-29E3-4FF8-96CF-24E05E9416BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A716F7D5-29E3-4FF8-96CF-24E05E9416BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A716F7D5-29E3-4FF8-96CF-24E05E9416BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65FEF516-1CCE-4649-975D-FC31D9B8D5CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65FEF516-1CCE-4649-975D-FC31D9B8D5CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65FEF516-1CCE-4649-975D-FC31D9B8D5CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65FEF516-1CCE-4649-975D-FC31D9B8D5CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{A716F7D5-29E3-4FF8-96CF-24E05E9416BC} = {30615ECD-82C4-4856-9082-2F493B78D54E}
+		{65FEF516-1CCE-4649-975D-FC31D9B8D5CA} = {30615ECD-82C4-4856-9082-2F493B78D54E}
 	EndGlobalSection
 EndGlobal

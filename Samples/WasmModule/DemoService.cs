@@ -27,8 +27,8 @@ namespace WasmModule
 
             while (progress < 100)
             {
-                await Task.Delay(TimeSpan.FromSeconds(rnd.Next(1, 5)));
-                progress += rnd.Next(3, 10);
+                await Task.Delay(TimeSpan.FromSeconds(rnd.Next(1, 3)));
+                progress += rnd.Next(5, 20);
                 if (progress > 100)
                     progress = 100;
 
@@ -42,21 +42,21 @@ namespace WasmModule
             var response = request.Deserialize<SumResponce>();
             response ??= new SumResponce();
             response.Calculate();
-            response.ServiceId = _id;
+            response.serviceId = _id;
             return response;
         }
     }
 
     public class SumResponce
     {
-        public string? ServiceId { get; set; }
+        public string? serviceId { get; set; }
 
-        public int X { get; set; }
+        public int x { get; set; }
 
-        public int Y { get; set; }
+        public int y { get; set; }
 
-        public int Sum { get; set; }
+        public int sum { get; set; }
 
-        public void Calculate() => Sum = X + Y;
+        public void Calculate() => sum = x + y;
     }
 }
