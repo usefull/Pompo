@@ -1,5 +1,5 @@
 # Pompo
-The brige to create and use .NET objects in JS code via Wasm.
+The brige to create and use .NET objects in JS code via WebAssembly.
 
 ## Intro
 We are going to create a WebAssembly module using the Blazor framework and the C# programming language. Then we will create a React application and embed the WebAssembly module in it so that we can use the functionality of the module in the application.
@@ -8,7 +8,10 @@ We are going to create a WebAssembly module using the Blazor framework and the C
 1. In the Visual Studio create Blazor WebAssembly Standalone App. Name it _WasmModule_.
 2. We don't need any pages in this project, it will contain only the functional service. So clear the _wwwroot_ folder. Remove _Layout_ and _Pages_ folders. Remove __Imports.razor_ and _App.razor_ files.
 3. Remove the _Microsoft.AspNetCore.Components.WebAssembly.DevServer_ package reference.
-4. Add _Pompo_ package reference.
+4. Add _Pompo_ package reference:
+```
+nuget install Pompo
+```
 5. Add the service class:
 ```cs
 using Microsoft.JSInterop;
