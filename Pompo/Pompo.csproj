@@ -13,7 +13,7 @@
 	<RepositoryUrl>https://github.com/usefull/Pompo</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
 	<PackageTags>wasm; webassembly; dotnet; js; javascript; invoke; jsinvokable</PackageTags>
-	<VersionPrefix>1.0.0</VersionPrefix>
+	<VersionPrefix>1.0.2</VersionPrefix>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
