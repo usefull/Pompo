@@ -79,8 +79,7 @@ namespace WasmModule
 ```
 As you can see, the service class is marked with an attribute _PompoAlias_ with a parameter _"demo"_. This means that the service will be available in the JS under the _demo_ name. The _PompoAlias_ attribute is otional. If the alias is not specified, the service name in JS will look like _{NAMESPACE}__{CLASSNAME}_.
 Class methods that are available for calling from JS are marked with the _JSInvokable_ attribute. The attribute parameter specifies the name of the method by which it will be available in JS. If the parameter is not specified, the method will be available by its real name. A class that has no JSInvokable methods will not be accessible in JS.
-
-8. Edit Program.cs.
+6. Edit Program.cs.
 ```cs
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using WasmModule;
@@ -93,8 +92,8 @@ await host.UsePompoAsync();
 await host.RunAsync();
 ```
 Here we just create the WebAssembly host, initialize the Pompo JS factory and launch the host.
-9. Build the application.
-10. Create the folder publish profile with default parameters and publish the application.
+7. Build the application.
+8. Create the folder publish profile with default parameters and publish the application.
 
 ## Creating a React application and embeding in it the WebAssembly module
 1. Create a React application:
