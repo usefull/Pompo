@@ -124,7 +124,7 @@ Pompo factory initialized.
 let demo = await window.dotNetObjectFactory.create_demo('foo');
 ```
 As you can see, to create the instance of the service, we use the _create_demo_ method. The method takes one argument, just like the service constructor.
-Method names for creating objects are formed as follows: create_{SERVICENAME}. _SERVICENAME_ is either an alias defined in the _PompoAlias_ attribute or a real class name with namespace.
+Method names for creating objects are formed as follows: _create_{SERVICENAME}_. _SERVICENAME_ is either an alias defined in the _PompoAlias_ attribute or a real class name with namespace.
 For example, if we didn't use the _PompoAlias_ attribute for the _DemoService_ class, the name of the method to create an instance of the service would look like this: create_WasmModule_DemoService.
 In any case, you can always look into the __pompo.js_ file and find out the name of a particular method.
 
