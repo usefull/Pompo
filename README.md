@@ -77,7 +77,7 @@ namespace WasmModule
     }
 }
 ```
-As you can see, the service class is marked with an attribute _PompoAlias_ with a parameter _"demo"_. This means that the service will be available in the JS under the _demo_ name. The _PompoAlias_ attribute is otional. If the alias is not specified, the service name in JS will look like _{NAMESPACE}__{CLASSNAME}_.
+As you can see, the service class is marked with an attribute _PompoAlias_ with a parameter _"demo"_. This means that the service will be available in the JS under the _demo_ name. The _PompoAlias_ attribute is optional. If the alias is not specified, the service name in JS will look like _{NAMESPACE}__{CLASSNAME}_.
 Class methods that are available for calling from JS are marked with the _JSInvokable_ attribute. The attribute parameter specifies the name of the method by which it will be available in JS. If the parameter is not specified, the method will be available by its real name. A class that has no JSInvokable methods will not be accessible in JS.
 
 6. Edit Program.cs.
