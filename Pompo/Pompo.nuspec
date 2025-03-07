@@ -6,7 +6,8 @@
     <authors>usefull</authors>
     <description>The brige to create and use .NET objects in JS code via WebAssembly.</description>
 	<readme>docs\README.md</readme>
-    <repository type="git" />
+    <repository type="git" url="https://github.com/usefull/Pompo.git" />
+	<projectUrl>https://github.com/usefull/Pompo</projectUrl>
     <dependencies>
 	    <group targetFramework="net9.0" />
     </dependencies>
