@@ -1,5 +1,7 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Pompo;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace WasmModule
@@ -56,6 +58,22 @@ namespace PompoTestWasm
 
         [JSInvokable("get")]
         public Selector GetObject() => new Selector { Name = $"{_name} TETYETT IOIYIY erer 2434 fgf", Value = 1.256 };
+
+        [Inject]
+        public string HttpClient { get; set; }
+
+        public static void Inject(object obj, IServiceProvider sp)
+        {
+            var props = obj.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Instance)
+                .Where(p => p.GetCustomAttributes(typeof(InjectAttribute), true).Any());
+
+            foreach (var p in props)
+            {
+                var s = sp.GetService(p.GetGetMethod().ReturnType)
+                    ?? throw new ApplicationException($"Unable resolve service {p.GetGetMethod().ReturnType.FullName} for property {obj.GetType().FullName}.{p.Name}");
+                p.SetValue(obj, s);
+            }
+        }
     }
 
     public class Selector

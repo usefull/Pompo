@@ -25,13 +25,27 @@ using Microsoft.JSInterop;
 
 {( string.IsNullOrWhiteSpace(_props["build_property.RootNamespace"]) ? string.Empty : $"namespace {_props["build_property.RootNamespace"]}" )}
 {( string.IsNullOrWhiteSpace(_props["build_property.RootNamespace"]) ? string.Empty : "{" )}
-    public class Factory(IJSObjectReference jsTransmitModule)
+    public class Factory(IJSObjectReference jsTransmitModule, IServiceProvider serviceProvider)
     {{
         private readonly IJSObjectReference _jsTransmitModule = jsTransmitModule;
+        private readonly IServiceProvider _serviceProvider = serviceProvider;
 
         private async Task TransmitObject<T>(DotNetObjectReference<T> obj)
             where T: class =>
             await _jsTransmitModule.InvokeVoidAsync(""transmit"", obj);
+
+        public void InjectServices(object obj)
+        {{
+            var props = obj.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Instance)
+                .Where(p => p.GetCustomAttributes(typeof(InjectAttribute), true).Any());
+
+            foreach (var p in props)
+            {{
+                var s = _serviceProvider.GetService(p.GetGetMethod().ReturnType)
+                    ?? throw new ApplicationException($""Unable resolve service {{p.GetGetMethod().ReturnType.FullName}} for property {{obj.GetType().FullName}}.{{p.Name}}"");
+                p.SetValue(obj, s);
+            }}
+        }}
 { GenerateCreateMethodsForFactory(classes) }
     }}
 {( string.IsNullOrWhiteSpace(_props["build_property.RootNamespace"]) ? string.Empty : "}" )}";
@@ -45,7 +59,12 @@ using Microsoft.JSInterop;
             "\n",
             classes.SelectMany(c => c.Ctors.Select(ctor => $@"
         [JSInvokable]
-        public async Task Create_{ctor.TransmitName}({ctor.Parameters}) => await TransmitObject(DotNetObjectReference.Create(new {c.FullName}({ctor.Parameters?.ToJsLikeParameterListString()})));")));
+        public async Task Create_{ctor.TransmitName}({ctor.Parameters}) =>
+        {{
+            var obj = DotNetObjectReference.Create(new {c.FullName}({ctor.Parameters?.ToJsLikeParameterListString()}));
+            InjectServices(obj);
+            await TransmitObject(obj);
+        }}")));
 
         /// <summary>
         /// Generates JS transmitter source code.
@@ -122,9 +141,10 @@ using Microsoft.JSInterop;
     {{
         public static async Task UsePompoAsync(this WebAssemblyHost host)
         {{
+            var serviceProvider = host.Services.GetRequiredService<IServiceProvider>();
             var jsRuntime = host.Services.GetRequiredService<IJSRuntime>();
             var jsTransmitModule = await jsRuntime.InvokeAsync<IJSObjectReference>(""import"", ""./{_props["build_property.PompoJsWrapperOutputFile"]}"");
-            var factory = DotNetObjectReference.Create(new Factory(jsTransmitModule));
+            var factory = DotNetObjectReference.Create(new Factory(jsTransmitModule, serviceProvider));
             await jsTransmitModule.InvokeVoidAsync(""transmit"", factory);
         }}
     }}
