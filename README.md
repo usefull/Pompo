@@ -128,5 +128,16 @@ Method names for creating objects are formed as follows: *create_{SERVICENAME}*.
 For example, if we didn't use the _PompoAlias_ attribute for the _DemoService_ class, the name of the method to create an instance of the service would look like this: *create_WasmModule_DemoService*.
 In any case, you can always look into the __pompo.js_ file and find out the name of a particular method.
 
+## Injecting services from DI
+Using the *Inject* attribute, it is possible to inject some service into the property of an object that will be used in JS. Mark the property with an attribute:
+```cs
+[Inject]
+public UtilityService UtilityService { get; set; }
+```
+Register service in DI:
+```cs
+builder.Services.AddTransient<UtilityService>();
+```
+
 ## In conclusion
 Sample projects for the WebAssembly module and the React application can be found in the _Samples_ folder of this repo.
