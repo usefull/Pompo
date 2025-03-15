@@ -21,11 +21,30 @@ window.transmitFunc = (obj) => {
         delete window.transmitFunc;
         return o;
     };
+
+    /////////////////////////////////////////////////////////////
+    window.dotNetObjectFactory.resolve_di = async (type) => {
+        let o = null;
+        window.transmitFunc = (obj, script) => {
+            console.log(script);
+            let fn = Function("obj", script);
+            o = fn(obj);
+        };
+        await window.dotNetObjectFactory.invokeMethodAsync(
+            'ResolveDI',
+            type
+        );
+        delete window.transmitFunc;
+        return o;
+    };
+
+    delete window.transmitFunc;
+    //////////////////////////////////////////////////////////////
     console.log('Pompo factory initialized.');
 };
 
-export function transmit(obj) {
+export function transmit(obj, script) {
     if (window.transmitFunc) {
-        window.transmitFunc(obj);
+        window.transmitFunc(obj, script);
     }
 };

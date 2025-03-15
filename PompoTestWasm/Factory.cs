@@ -5,41 +5,66 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Reflection;
 
 namespace WasmModule
 {
-    public class Factory(IJSObjectReference jsTransmitModule, IServiceProvider serviceProvider)
+    public partial class Factory(IJSObjectReference jsTransmitModule, IServiceProvider serviceProvider)
     {
         private readonly IJSObjectReference _jsTransmitModule = jsTransmitModule;
         private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-        private async Task TransmitObject<T>(DotNetObjectReference<T> obj)
-            where T: class =>
-            await _jsTransmitModule.InvokeVoidAsync("transmit", obj);
+        private async Task TransmitObject<T>(T obj, string? script = null)
+            where T : class
+        {
+            InjectServices(obj);
+            var objRef = DotNetObjectReference.Create(obj);
+            await _jsTransmitModule.InvokeVoidAsync("transmit", objRef, script);
+        }
 
         public void InjectServices(object obj)
         {
-            var props = obj.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Instance)
-                .Where(p => p.GetCustomAttributes(typeof(InjectAttribute), true).Length > 0);
+            var props = obj.GetType()
+                .GetProperties(BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Instance)
+                .Select(p => new { Info = p, Attr = p.GetCustomAttributes<InjectAttribute>().FirstOrDefault() })
+                .Where(i => i.Attr != null);
 
             foreach (var p in props)
             {
-                var method = p.GetGetMethod();
+                var method = p.Info.GetGetMethod();
                 if (method == null)
                     continue;
 
-                var s = _serviceProvider.GetService(method.ReturnType)
-                    ?? throw new ApplicationException($"Unable resolve service {method.ReturnType.FullName} for property {obj.GetType().FullName}.{p.Name}");
-                p.SetValue(obj, s);
+                object service;
+                try
+                {
+                    service = p.Attr!.Key == null
+                        ? _serviceProvider.GetRequiredService(method.ReturnType)
+                        : _serviceProvider.GetRequiredKeyedService(method.ReturnType, p.Attr!.Key);
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException($"Unable inject DI service {method.ReturnType.FullName} into property {obj.GetType().FullName}.{p.Info.Name}", ex);
+                }
+                p.Info.SetValue(obj, service);
             }
+        }
+
+        [JSInvokable]
+        public async Task ResolveDI(string type)
+        {
+            // todo: 1. Поиск типа по параметру type.
+            // todo: 2. Получение экземпляра из DI.
+            // todo: 3. Построение JS-скрипта для объявсления методов объекта.
+            // todo: 4. TransmitObject
+
+            // await TransmitObject(obj, "obj.testFunc = () => alert('bingo!!!');return obj;");
         }
 
         [JSInvokable]
         public async Task Create_demo(string id)
         {
-            var rawObj = new WasmModule.DemoService(id);
-            InjectServices(rawObj);
-            var obj = DotNetObjectReference.Create(rawObj);            
+            var obj = new WasmModule.DemoService(id);          
             await TransmitObject(obj);
         }
     }
