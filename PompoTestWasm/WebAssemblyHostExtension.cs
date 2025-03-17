@@ -6,7 +6,7 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 
-namespace WasmModule
+namespace Pompo
 {
     public static class WebAssemblyHostExtension
     {

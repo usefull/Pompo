@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PompoTestWasm;
+using Pompo;
 using WasmModule;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

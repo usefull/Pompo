@@ -7,6 +7,9 @@
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Constructor, AllowMultiple = false)]
     public class PompoAliasAttribute(string pseudonym) : Attribute
     {
+        /// <summary>
+        /// A type alias string.
+        /// </summary>
         public string Pseudonym { get; private set; } = pseudonym;
     }
 }

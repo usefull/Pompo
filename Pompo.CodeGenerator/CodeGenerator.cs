@@ -225,7 +225,9 @@ namespace Pompo
 
             if (classes.Count > 0)
             {
-                context.AddSource("Factory", classes.Count > 0 ? GenerateFactorySourceCode(classes) : " ");
+                context.AddSource("Factory.Constant", GenerateConstantFactorySourceCode());
+                if (classes.Count > 0)
+                    context.AddSource("Factory", GenerateFactorySourceCode(classes));
                 context.AddSource("Transmit", classes.Count > 0 ? GenerateTransmitterSourceCode(classes) : " ");
                 context.AddSource("WebAssemblyHostExtension", classes.Count > 0 ? GenerateWebAssemblyHostExtensionCode() : " ");
             }
