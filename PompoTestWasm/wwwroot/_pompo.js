@@ -26,7 +26,6 @@ window.transmitFunc = (obj) => {
     window.dotNetObjectFactory.resolve_di = async (type) => {
         let o = null;
         window.transmitFunc = (obj, script) => {
-            console.log(script);
             let fn = Function("obj", script);
             o = fn(obj);
         };

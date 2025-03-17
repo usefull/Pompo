@@ -7,6 +7,6 @@
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Constructor, AllowMultiple = false)]
     public class PompoAliasAttribute(string pseudonym) : Attribute
     {
-        private readonly string _pseudonym = pseudonym;
+        public string Pseudonym { get; private set; } = pseudonym;
     }
 }

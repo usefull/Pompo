@@ -5,14 +5,27 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Pompo;
 using System.Reflection;
 
 namespace WasmModule
 {
-    public partial class Factory(IJSObjectReference jsTransmitModule, IServiceProvider serviceProvider)
+    public partial class Factory
     {
-        private readonly IJSObjectReference _jsTransmitModule = jsTransmitModule;
-        private readonly IServiceProvider _serviceProvider = serviceProvider;
+        private readonly IJSObjectReference _jsTransmitModule;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly Dictionary<string, Type> _aliasedTypes;
+
+        public Factory(IJSObjectReference jsTransmitModule, IServiceProvider serviceProvider)
+        {
+            _jsTransmitModule = jsTransmitModule;
+            _serviceProvider = serviceProvider;
+
+            _aliasedTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+                .Select(t => new { Type = t, Alias = t.GetCustomAttribute<PompoAliasAttribute>()?.Pseudonym ?? string.Empty })
+                .Where(t => !string.IsNullOrWhiteSpace(t.Alias))
+                .ToDictionary(t => t.Alias, t => t.Type);
+        }
 
         private async Task TransmitObject<T>(T obj, string? script = null)
             where T : class
@@ -44,7 +57,7 @@ namespace WasmModule
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException($"Unable inject DI service {method.ReturnType.FullName} into property {obj.GetType().FullName}.{p.Info.Name}", ex);
+                    throw new ApplicationException($"Unable inject DI service {method.ReturnType.FullName} into property {obj.GetType().FullName}.{p.Info.Name}.", ex);
                 }
                 p.Info.SetValue(obj, service);
             }
@@ -53,12 +66,34 @@ namespace WasmModule
         [JSInvokable]
         public async Task ResolveDI(string type)
         {
-            // todo: 1. Поиск типа по параметру type.
-            // todo: 2. Получение экземпляра из DI.
-            // todo: 3. Построение JS-скрипта для объявсления методов объекта.
-            // todo: 4. TransmitObject
+            if (!_aliasedTypes.TryGetValue(type, out var typeToResolve))
+            {
+                typeToResolve = Type.GetType(type);
+                if (typeToResolve == null)
+                    throw new ApplicationException($"Unknown type name '{type}' to resolve.");
+            }
 
-            // await TransmitObject(obj, "obj.testFunc = () => alert('bingo!!!');return obj;");
+            object service;
+            try
+            {
+                service = _serviceProvider.GetRequiredService(typeToResolve);                    
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Unable resolve DI service by type name / alias: '{type}.", ex);
+            }
+
+            var scriptLines = typeToResolve.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .SelectMany(m => m.GetCustomAttributes<JSInvokableAttribute>().Select(a => new { Method = m, Attr = a }))
+                .Select(m =>
+                {
+                    var paramList = string.Join(", ", m.Method.GetParameters().Select(p => p.Name));
+                    return $"obj.{(string.IsNullOrWhiteSpace(m.Attr.Identifier) ? m.Method.Name : m.Attr.Identifier)} = async ({paramList}) => await obj.invokeMethodAsync('{(string.IsNullOrWhiteSpace(m.Attr.Identifier) ? m.Method.Name : m.Attr.Identifier)}'{(string.IsNullOrWhiteSpace(paramList) ? string.Empty : $", {paramList}")});";
+                });
+
+            var script = $"{string.Join('\n', scriptLines)}\nreturn obj;";
+
+            await TransmitObject(service, script);
         }
 
         [JSInvokable]
