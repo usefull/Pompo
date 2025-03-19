@@ -97,6 +97,15 @@ namespace Pompo.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Unable to resolve ambiguous type name &apos;{0}&apos;. Provide fully qualified type names (with full namespace) for constructor parameters to successfully generate factory..
+        /// </summary>
+        internal static string AmbiguousTypeName {
+            get {
+                return ResourceManager.GetString("AmbiguousTypeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The alias ​​defined multiple times for the class &apos;{0}&apos;..
         /// </summary>
         internal static string MultipleClassAliasDeclarations {

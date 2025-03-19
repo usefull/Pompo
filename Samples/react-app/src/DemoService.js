@@ -31,3 +31,8 @@ export const getUtilityService = async () => {
   await waitForFactory();
   return await window.dotNetObjectFactory.resolve_di('WasmModule.UtilityService');
 }
+
+export const getDiService = async () => {  
+  await waitForFactory();
+  return await window.dotNetObjectFactory.resolve_di('fromdi');
+}

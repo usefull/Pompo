@@ -78,7 +78,7 @@ namespace WasmModule
 }
 ```
 As you can see, the service class is marked with an attribute _PompoAlias_ with a parameter _"demo"_. This means that the service will be available in the JS under the _demo_ name. The _PompoAlias_ attribute is optional. If the alias is not specified, the service name in JS will look like _{NAMESPACE}__{CLASSNAME}_.
-Class methods that are available for calling from JS are marked with the _JSInvokable_ attribute. The attribute parameter specifies the name of the method by which it will be available in JS. If the parameter is not specified, the method will be available by its real name. A class that has no JSInvokable methods will not be accessible in JS.
+Class methods that are available for calling from JS are marked with the _JSInvokable_ attribute. The attribute parameter specifies the name of the method by which it will be available in JS. If the parameter is not specified, the method will be available by its real name.
 
 6. Edit Program.cs.
 ```cs
@@ -119,25 +119,82 @@ If everything is fine, a message will appear in the browser console:
 ```
 Pompo factory initialized.
 ```
-5. Now we have a factory available to create an instance of our service implemented in the WebAssembly module:
+
+## Explicit .NET object creation from JS code.
+Now we have a factory available to create an instance of our service implemented in the WebAssembly module:
 ```js
 let demo = await window.dotNetObjectFactory.create_demo('foo');
 ```
-As you can see, to create the instance of the service, we use the _create_demo_ method. The method takes one argument, just like the service constructor.
+As you can see, to explicit create the instance of the service, we use the _create_demo_ method. The method takes one argument, just like the service constructor.
 Method names for creating objects are formed as follows: *create_{SERVICENAME}*. _SERVICENAME_ is either an alias defined in the _PompoAlias_ attribute or a real class name with namespace.
 For example, if we didn't use the _PompoAlias_ attribute for the _DemoService_ class, the name of the method to create an instance of the service would look like this: *create_WasmModule_DemoService*.
 In any case, you can always look into the __pompo.js_ file and find out the name of a particular method.
 
-## Injecting services from DI
-Using the *Inject* attribute, it is possible to inject some service into the property of an object that will be used in JS. Mark the property with an attribute:
+## Resolving services from DI
+You can get a service object from the DI container. In order to have this opportunity, you need to register the service in DI.
+Let's create another service class:
 ```cs
-[Inject]
-public UtilityService UtilityService { get; set; }
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using Pompo;
+using System.Text.Json;
+
+namespace WasmModule
+{
+    [PompoAlias("fromdi")]
+    public class DiService(UtilityService utilityService)
+    {
+        private readonly UtilityService _ctorInitializedSvc = utilityService;
+
+        [Inject]
+        public UtilityService? InjectedSvc { get; set; }
+
+        [JSInvokable("check")]
+        public void Checking(JsonElement data)
+        {
+            Console.WriteLine($"Initialized via ctor service: {_ctorInitializedSvc.GetCreationTime()}");
+            Console.WriteLine($"Injected via property service: {InjectedSvc?.GetCreationTime()}");
+            Console.WriteLine($"data: prompt - {data.GetProperty("prompt").GetString()}, val - {data.GetProperty("val").GetDouble()}");
+        }
+    }
+}
 ```
-Register service in DI:
+and one more:
+```cs
+namespace WasmModule
+{
+    public class UtilityService
+    {
+        private readonly DateTime _creation;
+
+        public UtilityService()
+        {
+            _creation = DateTime.Now;
+            Console.WriteLine("Utility service has created");
+        }
+
+        public DateTime GetCreationTime() => _creation;
+    }
+}
+```
+Insert lines in the _Program.cs_ file before the host building:
 ```cs
 builder.Services.AddTransient<UtilityService>();
+builder.Services.AddTransient<DiService>();
+```
+Then in React application we can get the *DiService* object like this:
+```js
+let diService = await window.dotNetObjectFactory.resolve_di('fromdi');
 ```
 
+## Injecting services
+Using the *Inject* attribute, it is possible to inject some service into the property of other service. Mark the property with an attribute (as done above in the _DiService_ code):
+```cs
+[Inject]
+public UtilityService? InjectedSvc { get; set; }
+```
+Dependency injection via constructor parameters is also available. Of course, the service being injected must also be registered in DI.
+More info about using DI see [here](https://learn.microsoft.com/ru-ru/dotnet/core/extensions/dependency-injection).
+
 ## In conclusion
-Sample projects for the WebAssembly module and the React application can be found in the _Samples_ folder of this repo.
+Sample projects for the WebAssembly module and the React application can be found in the _Samples_ folder of [this repo](https://github.com/usefull/Pompo).

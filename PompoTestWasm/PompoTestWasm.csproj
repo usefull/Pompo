@@ -4,11 +4,11 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	  <!--
+	  
 	  <IsRoslynComponent>true</IsRoslynComponent>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	  <CompilerGeneratedFilesOutputPath>.g</CompilerGeneratedFilesOutputPath>
-	  -->
+	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,11 +16,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.2" PrivateAssets="all" />
   </ItemGroup>
 
-  <!--
+  
   <ItemGroup>
     <ProjectReference Include="..\Pompo.CodeGenerator\Pompo.CodeGenerator.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\Pompo\Pompo.csproj" />
   </ItemGroup>
-  -->
+ 
 
 </Project>

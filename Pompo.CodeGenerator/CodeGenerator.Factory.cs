@@ -40,7 +40,7 @@ namespace Pompo
             "\n",
             classes.SelectMany(c => c.Ctors.Select(ctor => $@"
         [JSInvokable]
-        public async Task Create_{ctor.TransmitName}({ctor.Parameters})
+        public async Task Create_{ctor.TransmitName}({ctor.Parameters?.ToParameterListStringWithFullTypenames(_types)})
         {{
             var obj = new {c.FullName}({ctor.Parameters?.ToJsLikeParameterListString()});          
             await TransmitObject(obj);

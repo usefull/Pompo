@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { getDemoService, getUtilityService } from "./DemoService";
+import { getDemoService, getDiService } from "./DemoService";
 
 function App() {
 
@@ -22,8 +22,8 @@ function App() {
   const onDI = async (e) => {
     e.preventDefault();
 
-    let us = await getUtilityService();
-    //console.log(sum);
+    let dis = await getDiService();
+    await dis.check({prompt: 'Hello, bro!!!', val: 1.569});
   };
 
   return (

@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Pompo.Entities;
 using Pompo.Exceptions;
 using Pompo.Extensions;
@@ -20,21 +19,9 @@ namespace Pompo
     public partial class CodeGenerator : IIncrementalGenerator
     {
         /// <summary>
-        /// The list of build properties required for source generation and their default values.
+        /// All types info.
         /// </summary>
-        private readonly Dictionary<string, string> _defaultProps = new Dictionary<string, string>
-        {
-            { "build_property.RootNamespace", string.Empty },
-            { "build_property.PompoJsWrapperOutputDir", "wwwroot" },
-            { "build_property.PompoJsWrapperOutputFile", "_pompo.js" }
-        };
-
-        /// <summary>
-        /// Current values of build properties.
-        /// </summary>
-        /// <remarks>Values are set by 
-        /// <see cref="SetBuildProps(SourceProductionContext, ImmutableArray{KeyValuePair{string, string}})"/></remarks>
-        private Dictionary<string, string> _props;
+        private List<TypeDescription> _types;
 
         /// <summary>
         /// Initializes source code analizer pipelines.
@@ -42,11 +29,11 @@ namespace Pompo
         /// <param name="context">Initialization context.</param>
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            // Extract build property values and save them in the _props field.
-            var propPipeline = context.AnalyzerConfigOptionsProvider
-                .SelectMany(SelectBuildProps)
+            // Extract all types info.
+            var typesPipeline = context.CompilationProvider
+                .SelectMany(GetTypes)
                 .Collect();
-            context.RegisterSourceOutput(propPipeline, SetBuildProps);
+            context.RegisterSourceOutput(typesPipeline, SetTypes);
 
             // Collect classes that should be accessible from JS and generate the necessary code.
             var pipeline =
@@ -58,26 +45,38 @@ namespace Pompo
         }
 
         /// <summary>
-        /// Selects build properties needed for generation and sets their values, if they are specified. 
+        /// Extracts types info from <see cref="Compilation"/> object.
         /// </summary>
-        /// <param name="provider">An analyzer options provider.</param>
-        /// <param name="cancellationToken">An operation cancellation token.</param>
-        /// <returns>Actual build property values.</returns>
-        private ImmutableArray<KeyValuePair<string, string>> SelectBuildProps(
-            AnalyzerConfigOptionsProvider provider, 
-            CancellationToken cancellationToken) =>
-            _defaultProps.Select(prop => new KeyValuePair<string, string>(
-                prop.Key,
-                provider.GlobalOptions.TryGetValue(prop.Key, out var str) ? str : prop.Value
-            )).ToImmutableArray();
+        /// <param name="compilation">Compilation object.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Type symbol enumeration.</returns>
+        private IEnumerable<INamedTypeSymbol> GetTypes(Compilation compilation, CancellationToken cancellationToken) =>
+            compilation.GetAllNamespaces().SelectMany(ns => ns.GetTypeMembers());
 
         /// <summary>
-        /// Saves actual build property values in the <see cref="_props/>.
+        /// Save types info in <see cref="_types"/> propersty.
         /// </summary>
         /// <param name="context">A source production context.</param>
-        /// <param name="source">Actual build property values to save.</param>
-        private void SetBuildProps(SourceProductionContext context, ImmutableArray<KeyValuePair<string, string>> source) =>        
-            _props = source.ToDictionary(s => s.Key, s => s.Value);
+        /// <param name="source">List of all types.</param>
+        private void SetTypes(SourceProductionContext context, ImmutableArray<INamedTypeSymbol> source)
+        {
+            _types = source.Select(t =>
+            {
+                var ns = t.ContainingNamespace;
+                var namespaces = new List<string>();
+                while (ns != null)
+                {
+                    namespaces.Add(ns.Name);
+                    ns = ns.ContainingNamespace;
+                }
+
+                return new TypeDescription
+                {
+                    Namespace = string.Join(".", namespaces.Where(n => !string.IsNullOrWhiteSpace(n)).Reverse()),
+                    Name = t.Name
+                };
+            }).ToList();
+        }
 
         /// <summary>
         /// Selection predicat for class declarations whose instances should be accessible from JS.

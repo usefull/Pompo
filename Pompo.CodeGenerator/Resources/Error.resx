@@ -129,6 +129,9 @@
   <data name="AliasNotFollowRules" xml:space="preserve">
     <value>The alias must consist of letters, numbers or  _ and can not starts with numbers.</value>
   </data>
+  <data name="AmbiguousTypeName" xml:space="preserve">
+    <value>Unable to resolve ambiguous type name '{0}'. Provide fully qualified type names (with full namespace) for constructor parameters to successfully generate factory.</value>
+  </data>
   <data name="MultipleClassAliasDeclarations" xml:space="preserve">
     <value>The alias ​​defined multiple times for the class '{0}'.</value>
   </data>
