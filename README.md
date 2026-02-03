@@ -8,11 +8,12 @@ We are going to create a WebAssembly module using the Blazor framework and the C
 1. In the Visual Studio create Blazor WebAssembly Standalone App. Name it _WasmModule_.
 2. We don't need any pages in this project, it will contain only the functional service. So clear the _wwwroot_ folder. Remove _Layout_ and _Pages_ folders. Remove __Imports.razor_ and _App.razor_ files.
 3. Remove the _Microsoft.AspNetCore.Components.WebAssembly.DevServer_ package reference.
-4. Add _Pompo_ package reference:
+4. Make sure the _OverrideHtmlAssetPlaceholders_ property in the project file is set to _false_.
+5. Add _Pompo_ package reference:
 ```
 nuget install Pompo
 ```
-5. Add the service class:
+6. Add the service class:
 ```cs
 using Microsoft.JSInterop;
 using Pompo;
@@ -80,10 +81,10 @@ namespace WasmModule
 As you can see, the service class is marked with an attribute _PompoAlias_ with a parameter _"demo"_. This means that the service will be available in the JS under the _demo_ name. The _PompoAlias_ attribute is optional. If the alias is not specified, the service name in JS will look like _{NAMESPACE}__{CLASSNAME}_.
 Class methods that are available for calling from JS are marked with the _JSInvokable_ attribute. The attribute parameter specifies the name of the method by which it will be available in JS. If the parameter is not specified, the method will be available by its real name.
 
-6. Edit Program.cs.
+7. Edit Program.cs.
 ```cs
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using WasmModule;
+using Pompo;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var host = builder.Build();
@@ -94,8 +95,8 @@ await host.RunAsync();
 ```
 Here we just create the WebAssembly host, initialize the Pompo JS factory and launch the host.
 
-7. Build the application.
-8. Create the folder publish profile with default parameters and publish the application.
+8. Build the application.
+9. Create the folder publish profile with default parameters and publish the application.
 
 ## Creating a React application and embeding in it the WebAssembly module
 1. Create a React application:
